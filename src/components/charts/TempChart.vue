@@ -69,7 +69,7 @@ export default class TempChart extends Mixins(BaseMixin) {
             },
             yAxis: this.yAxis,
             media: this.media,
-            dataset: { source: this.source },
+            dataset: {},
             series: this.series,
         }
     }
@@ -95,6 +95,7 @@ export default class TempChart extends Mixins(BaseMixin) {
                 obj[['left', 'right'][+(pos[0] < size.viewSize[0] / 2)]] = 5
                 return obj
             },
+            hideDelay: 500,            
         }
     }
 
@@ -261,6 +262,12 @@ export default class TempChart extends Mixins(BaseMixin) {
         return 15
     }
 
+    mounted() {
+        this.chart?.setOption({
+            dataset: { source: this.source },
+        })
+    }
+
     beforeDestroy() {
         if (typeof window === 'undefined') return
         if (this.chart) this.chart.dispose()
@@ -360,6 +367,10 @@ export default class TempChart extends Mixins(BaseMixin) {
         const limitDate = new Date(Date.now() - this.maxHistory * 1000)
         let newSource = newVal.filter((entry: PrinterTempHistoryStateSourceEntry) => {
             return entry.date >= limitDate
+        })
+
+        this.chart?.setOption({
+            dataset: { source: newSource },
         })
 
         // reset tempHistory if working sources are smaller than 80%
